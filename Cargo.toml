@@ -1,0 +1,12 @@
+[package]
+
+name = "tenacious"
+version = "0.0.1"
+authors = ["Manish Goregaokar <manishsmail@gmail.com>"]
+
+[lib]
+name = "tenacious"
+crate_type = ["dylib"]
+
+[dev-dependencies.compiletest]
+git = "https://github.com/laumann/compiletest-rs.git"
