@@ -24,6 +24,14 @@ fn baz() {
     let y = x; //~ ERROR #[no_move] type `collections::vec::Vec<Foo>` moved
 }
 
+fn quux() -> Foo {
+    Foo //~ ERROR
+}
+
+fn test() {
+    let x = quux();
+    let y = x; //~ ERROR
+}
 #[derive(Debug)]
 #[no_move]
 struct Foo;
