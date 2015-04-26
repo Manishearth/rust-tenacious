@@ -126,6 +126,7 @@ fn is_ty_no_move(tcx: &ty::ctxt, t: ty::Ty) -> bool {
             ty::ty_struct(did, _) | ty::ty_enum(did, _) => {
                 if ty::has_attr(tcx, did, "no_move") {
                     found = true;
+                    return false;
                 }
                 true
             },
