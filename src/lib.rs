@@ -77,7 +77,11 @@ struct TenaciousDelegate<'a, 'tcx: 'a>(&'a Context<'a, 'tcx>);
 impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
     fn consume(&mut self, _: NodeId, consume_span: Span,
                cmt: cmt<'tcx>, mode: euv::ConsumeMode) {
-        if let euv::Move(_) = mode {
+        if let categorization::cat_rvalue(_) = cmt.cat {
+            // Ignore `let x = rvalue()`
+            return;
+        }
+        if let euv::Move(..) = mode {
             if is_ty_no_move(self.0.tcx, cmt.ty) {
                 self.0.span_lint(MOVED_NO_MOVE, consume_span,
                                  &format!("#[no_move] type `{}` moved", cmt.ty.repr(self.0.tcx))[..])
@@ -86,6 +90,10 @@ impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
 
     }
     fn matched_pat(&mut self, pat: &Pat, cmt: cmt<'tcx>, mode: euv::MatchMode) {
+        if let categorization::cat_rvalue(_) = cmt.cat {
+            // Ignore `let x = rvalue()`
+            return;
+        }
         if let euv::MovingMatch = mode {
             if is_ty_no_move(self.0.tcx, cmt.ty) {
                 self.0.span_lint(MOVED_NO_MOVE, pat.span,
