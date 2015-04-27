@@ -1,5 +1,6 @@
-## rust-tenacious
+## rust-tenacious 
 
+[![Build Status](https://travis-ci.org/Manishearth/rust-tenacious.svg?branch=master)](https://travis-ci.org/Manishearth/rust-tenacious)
 
 This plugin warns when types marked `#[no_move]` are being moved.
 
