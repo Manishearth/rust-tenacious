@@ -3,6 +3,8 @@
 
 This plugin warns when types marked `#[no_move]` are being moved.
 
+This is quite useful for ensuring that things don't get moved around when data is shared via an FFI. Servo [uses this](https://github.com/servo/servo/pull/5855) for safely sharing rooted values with the spidermonkey GC.
+
 Note that `#[no_move]` is transitive, any struct or enum containing a `#[no_move]` type
 must be annotated as well. Similarly, any type with `#[no_move]` substitutions in its type parameters
 (E.g. `Vec<Foo>` where `Foo` is `no_move`) will be treated as immovable.
@@ -44,3 +46,5 @@ struct MoreFoo2 {
 }
 ```
 
+
+Note that this will not lint on the moving of temporaries (though it's easy to tweak it to do so). For example, if `foo()` returns a move-protected value, `bar(foo())` will not error even though `let x = foo(); bar(x)` will, since the value returned by `foo()` is a temporary (rvalue) and doesn't actualy get moved in memory.
