@@ -48,3 +48,6 @@ struct MoreFoo2 {
 
 
 Note that this will not lint on the moving of temporaries (though it's easy to tweak it to do so). For example, if `foo()` returns a move-protected value, `bar(foo())` will not error even though `let x = foo(); bar(x)` will, since the value returned by `foo()` is a temporary (rvalue) and doesn't actualy get moved in memory.
+
+
+It also will not catch moves within generic functions like `mem::swap()` and `mem::replace()``
