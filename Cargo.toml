@@ -6,7 +6,7 @@ authors = ["Manish Goregaokar <manishsmail@gmail.com>"]
 
 [lib]
 name = "tenacious"
-crate_type = ["dylib"]
+plugin = true
 
 [dev-dependencies.compiletest]
 git = "https://github.com/laumann/compiletest-rs.git"
