@@ -11,7 +11,7 @@ keywords = ["tenacious", "move", "plugin"]
 
 [lib]
 name = "tenacious"
-crate_type = ["dylib"]
+plugin = true
 
 [dev-dependencies]
 compiletest_rs = "*"
