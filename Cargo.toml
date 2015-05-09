@@ -3,10 +3,15 @@
 name = "tenacious"
 version = "0.0.1"
 authors = ["Manish Goregaokar <manishsmail@gmail.com>"]
+description = "A plugin to prevent certain types from being moved"
+repository = "https://github.com/Manishearth/rust-tenacious"
+readme = "README.md"
+license = "MPL-2.0"
+keywords = ["tenacious", "move", "plugin"]
 
 [lib]
 name = "tenacious"
 crate_type = ["dylib"]
 
-[dev-dependencies.compiletest]
-git = "https://github.com/laumann/compiletest-rs.git"
+[dev-dependencies]
+compiletest_rs = "*"
