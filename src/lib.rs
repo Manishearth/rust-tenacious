@@ -11,6 +11,7 @@ use rustc::plugin::Registry;
 use rustc::lint::LintPassObject;
 
 use syntax::ast::*;
+use syntax::ast_map;
 use syntax::visit;
 use syntax::codemap::Span;
 use rustc::lint::{Context, LintPass, LintArray};
@@ -45,7 +46,11 @@ impl LintPass for TenaciousPass {
         vis.walk_fn(decl, body)
     }
     fn check_struct_def(&mut self, cx: &Context, def: &StructDef, _: Ident, _: &Generics, id: NodeId) {
-        if cx.tcx.map.expect_item(id).attrs.iter().all(|a| !a.check_name("no_move")) {
+        let item = match cx.tcx.map.get(id) {
+            ast_map::NodeItem(it) => it,
+            _ => cx.tcx.map.expect_item(cx.tcx.map.get_parent(id)),
+        };
+        if item.attrs.iter().all(|a| !a.check_name("no_move")) {
             for ref field in def.fields.iter() {
                 if is_ty_no_move(cx.tcx, ty::node_id_to_type(cx.tcx, field.node.id)) {
                     cx.span_lint(MOVED_NO_MOVE, field.span,
