@@ -11,7 +11,7 @@ use rustc::plugin::Registry;
 use rustc::lint::LintPassObject;
 
 use syntax::ast::*;
-use syntax::ast_map;
+use rustc::ast_map;
 use syntax::visit;
 use syntax::codemap::Span;
 use rustc::lint::{Context, LintPass, LintArray};
@@ -128,14 +128,14 @@ fn is_ty_no_move(tcx: &ty::ctxt, t: ty::Ty) -> bool {
     let mut found = false;
     ty::maybe_walk_ty(t, |ty| {
         match ty.sty {
-            ty::ty_struct(did, _) | ty::ty_enum(did, _) => {
+            ty::TyStruct(did, _) | ty::TyEnum(did, _) => {
                 if ty::has_attr(tcx, did, "no_move") {
                     found = true;
                     return false;
                 }
                 true
             },
-            ty::ty_ptr(..) | ty::ty_rptr(..) => false, // don't recurse down ptrs
+            ty::TyRef(..) | ty::TyRawPtr(..) => false, // don't recurse down ptrs
             _ => true
         }
     });
