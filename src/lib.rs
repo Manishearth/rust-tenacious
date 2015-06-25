@@ -16,7 +16,6 @@ use syntax::visit;
 use syntax::codemap::Span;
 use rustc::lint::{Context, LintPass, LintArray};
 use rustc::middle::ty;
-use rustc::util::ppaux::Repr;
 use rustc::middle::expr_use_visitor as euv;
 use rustc::middle::mem_categorization::{cmt, categorization};
 use syntax::attr::AttrMetaMethods;
@@ -89,7 +88,7 @@ impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
         if let euv::Move(..) = mode {
             if is_ty_no_move(self.0.tcx, cmt.ty) {
                 self.0.span_lint(MOVED_NO_MOVE, consume_span,
-                                 &format!("#[no_move] type `{}` moved", cmt.ty.repr(self.0.tcx))[..])
+                                 &format!("#[no_move] type `{:?}` moved", cmt.ty)[..])
             }
         }
 
@@ -102,7 +101,7 @@ impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
         if let euv::MovingMatch = mode {
             if is_ty_no_move(self.0.tcx, cmt.ty) {
                 self.0.span_lint(MOVED_NO_MOVE, pat.span,
-                                 &format!("#[no_move] type `{}` moved", cmt.ty.repr(self.0.tcx))[..])
+                                 &format!("#[no_move] type `{:?}` moved", cmt.ty)[..])
             }
         }
     }
@@ -114,7 +113,7 @@ impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
         if let euv::Move(_) = mode {
             if is_ty_no_move(self.0.tcx, cmt.ty) {
                 self.0.span_lint(MOVED_NO_MOVE, pat.span,
-                                 &format!("#[no_move] type `{}` moved", cmt.ty.repr(self.0.tcx))[..])
+                                 &format!("#[no_move] type `{:?}` moved", cmt.ty)[..])
             }
         }
     }
