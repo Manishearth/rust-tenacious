@@ -51,7 +51,7 @@ impl LintPass for TenaciousPass {
         };
         if item.attrs.iter().all(|a| !a.check_name("no_move")) {
             for ref field in def.fields.iter() {
-                if is_ty_no_move(cx.tcx, ty::node_id_to_type(cx.tcx, field.node.id)) {
+                if is_ty_no_move(cx.tcx, cx.tcx.node_id_to_type(field.node.id)) {
                     cx.span_lint(MOVED_NO_MOVE, field.span,
                                  "Structs containing #[no_move] fields should be marked #[no_move]")
                 }
@@ -63,7 +63,7 @@ impl LintPass for TenaciousPass {
         if map.expect_item(map.get_parent(var.node.id)).attrs.iter().all(|a| !a.check_name("no_move")) {
             match var.node.kind {
                 TupleVariantKind(_) => {
-                    if is_ty_no_move(cx.tcx, ty::node_id_to_type(cx.tcx, var.node.id)) {
+                    if is_ty_no_move(cx.tcx, cx.tcx.node_id_to_type(var.node.id)) {
                         cx.span_lint(MOVED_NO_MOVE, var.span,
                                      "Enums containing #[no_move] fields should be marked #[no_move]")
                     }
@@ -125,10 +125,10 @@ impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
 
 fn is_ty_no_move(tcx: &ty::ctxt, t: ty::Ty) -> bool {
     let mut found = false;
-    ty::maybe_walk_ty(t, |ty| {
+    t.maybe_walk(|ty| {
         match ty.sty {
             ty::TyStruct(did, _) | ty::TyEnum(did, _) => {
-                if ty::has_attr(tcx, did, "no_move") {
+                if tcx.has_attr(did, "no_move") {
                     found = true;
                     return false;
                 }
