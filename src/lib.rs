@@ -17,6 +17,7 @@ use syntax::codemap::Span;
 use rustc::lint::{Context, LintPass, LintArray};
 use rustc::middle::ty;
 use rustc::middle::expr_use_visitor as euv;
+use rustc::middle::infer;
 use rustc::middle::mem_categorization::{cmt, categorization};
 use syntax::attr::AttrMetaMethods;
 
@@ -40,8 +41,9 @@ impl LintPass for TenaciousPass {
 
     fn check_fn(&mut self, cx: &Context, _: visit::FnKind, decl: &FnDecl, body: &Block, _: Span, id: NodeId) {
         let param_env = ty::ParameterEnvironment::for_item(cx.tcx, id);
+        let infcx = infer::new_infer_ctxt(cx.tcx, &cx.tcx.tables, Some(param_env), false);
         let mut v = TenaciousDelegate(cx);
-        let mut vis = euv::ExprUseVisitor::new(&mut v, &param_env);
+        let mut vis = euv::ExprUseVisitor::new(&mut v, &infcx);
         vis.walk_fn(decl, body)
     }
     fn check_struct_def(&mut self, cx: &Context, def: &StructDef, _: Ident, _: &Generics, id: NodeId) {
