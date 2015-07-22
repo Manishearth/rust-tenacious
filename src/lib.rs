@@ -30,6 +30,21 @@ pub fn plugin_registrar(reg: &mut Registry) {
 /// A lint pass which catches moves of types marked #[no_move]
 pub struct TenaciousPass;
 
+#[cfg(feature = "rvalue_checks")]
+fn is_in_let(tcx: &ty::ctxt, id: NodeId) -> bool {
+    if let ast_map::NodeStmt(ref st) = tcx.map.get(tcx.map.get_parent_node(id)) {
+        if let StmtDecl(..) = st.node {
+            println!("found");
+            return true
+        }
+    }
+    false
+}
+
+#[cfg(not(feature = "rvalue_checks"))]
+fn is_in_let(_: &ty::ctxt, _: NodeId) -> bool {
+    true
+}
 
 declare_lint!(pub MOVED_NO_MOVE, Warn,
               "warn on moving of immovable types");
@@ -85,7 +100,9 @@ impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
                cmt: cmt<'tcx>, mode: euv::ConsumeMode) {
         if let categorization::cat_rvalue(_) = cmt.cat {
             // Ignore `let x = rvalue()`
-            return;
+            if is_in_let(self.0.tcx, cmt.id) {
+                return;
+            }
         }
         if let euv::Move(..) = mode {
             if is_ty_no_move(self.0.tcx, cmt.ty) {
@@ -97,7 +114,7 @@ impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
     }
     fn matched_pat(&mut self, pat: &Pat, cmt: cmt<'tcx>, mode: euv::MatchMode) {
         if let categorization::cat_rvalue(_) = cmt.cat {
-            // Ignore `let x = rvalue()`
+            // Ignore `let x = ...`
             return;
         }
         if let euv::MovingMatch = mode {
