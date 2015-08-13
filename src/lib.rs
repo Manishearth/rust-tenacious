@@ -147,7 +147,7 @@ fn is_ty_no_move(tcx: &ty::ctxt, t: ty::Ty) -> bool {
     t.maybe_walk(|ty| {
         match ty.sty {
             ty::TyStruct(did, _) | ty::TyEnum(did, _) => {
-                if tcx.has_attr(did, "no_move") {
+                if tcx.has_attr(did.did, "no_move") {
                     found = true;
                     return false;
                 }
