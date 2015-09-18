@@ -7,12 +7,15 @@ extern crate syntax;
 #[macro_use]
 extern crate rustc;
 
+extern crate rustc_front;
+
 use rustc::plugin::Registry;
 use rustc::lint::LintPassObject;
 
-use syntax::ast::*;
-use rustc::ast_map;
-use syntax::visit;
+use rustc_front::hir::*;
+use syntax::ast::{NodeId, Ident};
+use rustc::front::map as ast_map;
+use rustc_front::visit;
 use syntax::codemap::Span;
 use rustc::lint::{Context, LintPass, LintArray};
 use rustc::middle::ty;
