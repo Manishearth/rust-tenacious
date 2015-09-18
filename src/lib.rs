@@ -10,14 +10,14 @@ extern crate rustc;
 extern crate rustc_front;
 
 use rustc::plugin::Registry;
-use rustc::lint::LintPassObject;
 
 use rustc_front::hir::*;
 use syntax::ast::{NodeId, Ident};
 use rustc::front::map as ast_map;
 use rustc_front::visit;
 use syntax::codemap::Span;
-use rustc::lint::{Context, LintPass, LintArray};
+use rustc::lint::{LintPass, LintArray, LateLintPass, LintContext};
+use rustc::lint::LateContext as Context;
 use rustc::middle::ty;
 use rustc::middle::expr_use_visitor as euv;
 use rustc::middle::infer;
@@ -26,7 +26,7 @@ use syntax::attr::AttrMetaMethods;
 
 #[plugin_registrar]
 pub fn plugin_registrar(reg: &mut Registry) {
-    reg.register_lint_pass(box TenaciousPass as LintPassObject);
+    reg.register_late_lint_pass(box TenaciousPass);
 }
 
 #[allow(missing_copy_implementations)]
@@ -57,6 +57,9 @@ impl LintPass for TenaciousPass {
         lint_array!(MOVED_NO_MOVE)
     }
 
+}
+
+impl LateLintPass for TenaciousPass {
     fn check_fn(&mut self, cx: &Context, _: visit::FnKind, decl: &FnDecl, body: &Block, _: Span, id: NodeId) {
         let param_env = ty::ParameterEnvironment::for_item(cx.tcx, id);
         let infcx = infer::new_infer_ctxt(cx.tcx, &cx.tcx.tables, Some(param_env), false);
