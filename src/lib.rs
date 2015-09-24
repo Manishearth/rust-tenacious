@@ -12,7 +12,7 @@ extern crate rustc_front;
 use rustc::plugin::Registry;
 
 use rustc_front::hir::*;
-use syntax::ast::{NodeId, Ident};
+use syntax::ast::{NodeId, Name};
 use rustc::front::map as ast_map;
 use rustc_front::visit;
 use syntax::codemap::Span;
@@ -67,7 +67,7 @@ impl LateLintPass for TenaciousPass {
         let mut vis = euv::ExprUseVisitor::new(&mut v, &infcx);
         vis.walk_fn(decl, body)
     }
-    fn check_struct_def(&mut self, cx: &Context, def: &StructDef, _: Ident, _: &Generics, id: NodeId) {
+    fn check_struct_def(&mut self, cx: &Context, def: &StructDef, _: Name, _: &Generics, id: NodeId) {
         let item = match cx.tcx.map.get(id) {
             ast_map::NodeItem(it) => it,
             _ => cx.tcx.map.expect_item(cx.tcx.map.get_parent(id)),
