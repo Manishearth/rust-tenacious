@@ -67,35 +67,20 @@ impl LateLintPass for TenaciousPass {
         let mut vis = euv::ExprUseVisitor::new(&mut v, &infcx);
         vis.walk_fn(decl, body)
     }
-    fn check_struct_def(&mut self, cx: &Context, def: &StructDef, _: Name, _: &Generics, id: NodeId) {
+    fn check_struct_def(&mut self, cx: &Context, def: &VariantData, _: Name, _: &Generics, id: NodeId) {
         let item = match cx.tcx.map.get(id) {
             ast_map::NodeItem(it) => it,
             _ => cx.tcx.map.expect_item(cx.tcx.map.get_parent(id)),
         };
         if item.attrs.iter().all(|a| !a.check_name("no_move")) {
-            for ref field in def.fields.iter() {
+            for ref field in def.fields() {
                 if is_ty_no_move(cx.tcx, cx.tcx.node_id_to_type(field.node.id)) {
                     cx.span_lint(MOVED_NO_MOVE, field.span,
-                                 "Structs containing #[no_move] fields should be marked #[no_move]")
+                                 "Structs and enums containing #[no_move] fields should be marked #[no_move]")
                 }
             }
         }
-    }
-    fn check_variant(&mut self, cx: &Context, var: &Variant, _: &Generics) {
-        let ref map = cx.tcx.map;
-        if map.expect_item(map.get_parent(var.node.id)).attrs.iter().all(|a| !a.check_name("no_move")) {
-            match var.node.kind {
-                TupleVariantKind(_) => {
-                    if is_ty_no_move(cx.tcx, cx.tcx.node_id_to_type(var.node.id)) {
-                        cx.span_lint(MOVED_NO_MOVE, var.span,
-                                     "Enums containing #[no_move] fields should be marked #[no_move]")
-                    }
-                }
-                _ => () // Struct variants already caught by check_struct_def
-            }
-        }
-    }
-        
+    }   
 }
 
 

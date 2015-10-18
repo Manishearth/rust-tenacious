@@ -38,15 +38,15 @@ fn test() {
 struct Foo;
 
 enum FooBar {
-    Foo(Foo), //~ ERROR Enums containing
+    Foo(Foo), //~ ERROR Structs and enums containing
     Bar
 }
 
 struct FooStruct<'a> {
-    foo: Foo, //~ ERROR Structs containing
+    foo: Foo, //~ ERROR Structs and enums containing
     bar: u8,
-    foovec: Vec<Foo>, //~ ERROR Structs containing
-    fooarr: [Foo; 5], //~ ERROR Structs containing
+    foovec: Vec<Foo>, //~ ERROR Structs and enums containing
+    fooarr: [Foo; 5], //~ ERROR Structs and enums containing
     fooptr: &'a Foo // this is okay
 }
 

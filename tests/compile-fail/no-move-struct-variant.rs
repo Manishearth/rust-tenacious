@@ -10,7 +10,7 @@ fn main() {
 }
 
 enum FooBar {
-    Foo {foo: Foo}, //~ ERROR Structs containing
+    Foo {foo: Foo}, //~ ERROR Structs and enums containing
     Bar
 }
 
