@@ -21,7 +21,7 @@ use rustc::lint::LateContext as Context;
 use rustc::middle::ty;
 use rustc::middle::expr_use_visitor as euv;
 use rustc::middle::infer;
-use rustc::middle::mem_categorization::{cmt, categorization};
+use rustc::middle::mem_categorization::{cmt, Categorization};
 use syntax::attr::AttrMetaMethods;
 
 #[plugin_registrar]
@@ -89,7 +89,7 @@ struct TenaciousDelegate<'a, 'tcx: 'a>(&'a Context<'a, 'tcx>);
 impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
     fn consume(&mut self, _: NodeId, consume_span: Span,
                cmt: cmt<'tcx>, mode: euv::ConsumeMode) {
-        if let categorization::cat_rvalue(_) = cmt.cat {
+        if let Categorization::Rvalue(_) = cmt.cat {
             // Ignore `let x = rvalue()`
             if is_in_let(self.0.tcx, cmt.id) {
                 return;
@@ -104,7 +104,7 @@ impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
 
     }
     fn matched_pat(&mut self, pat: &Pat, cmt: cmt<'tcx>, mode: euv::MatchMode) {
-        if let categorization::cat_rvalue(_) = cmt.cat {
+        if let Categorization::Rvalue(_) = cmt.cat {
             // Ignore `let x = ...`
             return;
         }
@@ -116,7 +116,7 @@ impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
         }
     }
     fn consume_pat(&mut self, pat: &Pat, cmt: cmt<'tcx>, mode: euv::ConsumeMode) {
-        if let categorization::cat_rvalue(_) = cmt.cat {
+        if let Categorization::Rvalue(_) = cmt.cat {
             // Ignore `let x = rvalue()`
             return;
         }
