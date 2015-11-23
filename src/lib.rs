@@ -14,7 +14,7 @@ use rustc::plugin::Registry;
 use rustc_front::hir::*;
 use syntax::ast::{NodeId, Name};
 use rustc::front::map as ast_map;
-use rustc_front::visit;
+use rustc_front::intravisit as visit;
 use syntax::codemap::Span;
 use rustc::lint::{LintPass, LintArray, LateLintPass, LintContext};
 use rustc::lint::LateContext as Context;
@@ -80,7 +80,7 @@ impl LateLintPass for TenaciousPass {
                 }
             }
         }
-    }   
+    }
 }
 
 
