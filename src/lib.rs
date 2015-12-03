@@ -6,10 +6,10 @@
 extern crate syntax;
 #[macro_use]
 extern crate rustc;
-
 extern crate rustc_front;
+extern crate rustc_plugin;
 
-use rustc::plugin::Registry;
+use rustc_plugin::Registry;
 
 use rustc_front::hir::*;
 use syntax::ast::{NodeId, Name};
