@@ -62,7 +62,7 @@ impl LintPass for TenaciousPass {
 impl LateLintPass for TenaciousPass {
     fn check_fn(&mut self, cx: &Context, _: visit::FnKind, decl: &FnDecl, body: &Block, _: Span, id: NodeId) {
         let param_env = ty::ParameterEnvironment::for_item(cx.tcx, id);
-        let infcx = infer::new_infer_ctxt(cx.tcx, &cx.tcx.tables, Some(param_env), false);
+        let infcx = infer::new_infer_ctxt(cx.tcx, &cx.tcx.tables, Some(param_env));
         let mut v = TenaciousDelegate(cx);
         let mut vis = euv::ExprUseVisitor::new(&mut v, &infcx);
         vis.walk_fn(decl, body)
