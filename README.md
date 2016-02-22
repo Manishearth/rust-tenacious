@@ -52,3 +52,6 @@ Note that this will not lint on the moving of temporaries (though it's easy to t
 
 
 It also will not catch moves within generic functions like `mem::swap()` and `mem::replace()``
+
+
+Be aware that if you depend on a crate using `#[no_move]`, you must have `#![plugin(tenacious)]` in your own crate to see the warnings.
