@@ -144,7 +144,7 @@ fn is_ty_no_move(tcx: &ty::ctxt, t: ty::Ty) -> bool {
                 }
                 true
             },
-            ty::TyRef(..) | ty::TyRawPtr(..) => false, // don't recurse down ptrs
+            ty::TyBox(..) | ty::TyRef(..) | ty::TyRawPtr(..) => false, // don't recurse down ptrs
             _ => true
         }
     });
