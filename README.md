@@ -54,4 +54,10 @@ Note that this will not lint on the moving of temporaries (though it's easy to t
 It also will not catch moves within generic functions like `mem::swap()` and `mem::replace()``
 
 
+Adding the `#[allow(moved_no_move)]` annotation to a struct will suppress warnings
+that the struct contains a `#[no_move]` type but is not marked as `#[no_move]`.
+The `#[allow_movable_interior]` attribute does the above and additionally permits
+moveable types in type parameters. See `tests/run-pass/allow-move.rs` for examples.
+
+
 Be aware that if you depend on a crate using `#[no_move]`, you must have `#![plugin(tenacious)]` in your own crate to see the warnings.
