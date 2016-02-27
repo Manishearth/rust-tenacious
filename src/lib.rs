@@ -72,7 +72,7 @@ impl LateLintPass for TenaciousPass {
             ast_map::NodeItem(it) => it,
             _ => cx.tcx.map.expect_item(cx.tcx.map.get_parent(id)),
         };
-        if item.attrs.iter().all(|a| !a.check_name("no_move")) {
+        if item.attrs.iter().all(|a| !a.check_name("no_move") && !a.check_name("allow_movable_interior")) {
             for ref field in def.fields() {
                 if is_ty_no_move(cx.tcx, cx.tcx.node_id_to_type(field.node.id)) {
                     cx.span_lint(MOVED_NO_MOVE, field.span,
@@ -138,6 +138,9 @@ fn is_ty_no_move(tcx: &ty::ctxt, t: ty::Ty) -> bool {
     t.maybe_walk(|ty| {
         match ty.sty {
             ty::TyStruct(did, _) | ty::TyEnum(did, _) => {
+                if tcx.has_attr(did.did, "allow_movable_interior") {
+                    return false;
+                }
                 if tcx.has_attr(did.did, "no_move") {
                     found = true;
                     return false;
