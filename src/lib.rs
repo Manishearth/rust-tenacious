@@ -74,7 +74,7 @@ impl LateLintPass for TenaciousPass {
         };
         if item.attrs.iter().all(|a| !a.check_name("no_move") && !a.check_name("allow_movable_interior")) {
             for ref field in def.fields() {
-                if is_ty_no_move(cx.tcx, cx.tcx.node_id_to_type(field.node.id)) {
+                if is_ty_no_move(cx.tcx, cx.tcx.node_id_to_type(field.id)) {
                     cx.span_lint(MOVED_NO_MOVE, field.span,
                                  "Structs and enums containing #[no_move] fields should be marked #[no_move]")
                 }
