@@ -34,7 +34,7 @@ pub fn plugin_registrar(reg: &mut Registry) {
 pub struct TenaciousPass;
 
 #[cfg(feature = "rvalue_checks")]
-fn is_in_let(tcx: &ty::ctxt, id: NodeId) -> bool {
+fn is_in_let(tcx: &ty::TyCtxt, id: NodeId) -> bool {
     if let ast_map::NodeStmt(ref st) = tcx.map.get(tcx.map.get_parent_node(id)) {
         if let StmtDecl(..) = st.node {
             println!("found");
@@ -45,7 +45,7 @@ fn is_in_let(tcx: &ty::ctxt, id: NodeId) -> bool {
 }
 
 #[cfg(not(feature = "rvalue_checks"))]
-fn is_in_let(_: &ty::ctxt, _: NodeId) -> bool {
+fn is_in_let(_: &ty::TyCtxt, _: NodeId) -> bool {
     true
 }
 
@@ -74,7 +74,7 @@ impl LateLintPass for TenaciousPass {
         };
         if item.attrs.iter().all(|a| !a.check_name("no_move") && !a.check_name("allow_movable_interior")) {
             for ref field in def.fields() {
-                if is_ty_no_move(cx.tcx, cx.tcx.node_id_to_type(field.node.id)) {
+                if is_ty_no_move(cx.tcx, cx.tcx.node_id_to_type(field.id)) {
                     cx.span_lint(MOVED_NO_MOVE, field.span,
                                  "Structs and enums containing #[no_move] fields should be marked #[no_move]")
                 }
@@ -133,7 +133,7 @@ impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
     fn mutate(&mut self, _: NodeId, _: Span, _: cmt<'tcx>, _: euv::MutateMode) {}
 }
 
-fn is_ty_no_move(tcx: &ty::ctxt, t: ty::Ty) -> bool {
+fn is_ty_no_move(tcx: &ty::TyCtxt, t: ty::Ty) -> bool {
     let mut found = false;
     t.maybe_walk(|ty| {
         match ty.sty {
