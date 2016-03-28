@@ -15,13 +15,13 @@ use rustc_front::hir::*;
 use syntax::ast::{NodeId, Name};
 use rustc::front::map as ast_map;
 use rustc_front::intravisit as visit;
-use rustc::middle::traits::ProjectionMode;
+use rustc::traits::ProjectionMode;
 use syntax::codemap::Span;
 use rustc::lint::{LintPass, LintArray, LateLintPass, LintContext};
 use rustc::lint::LateContext as Context;
-use rustc::middle::ty;
+use rustc::ty;
 use rustc::middle::expr_use_visitor as euv;
-use rustc::middle::infer;
+use rustc::infer;
 use rustc::middle::mem_categorization::{cmt, Categorization};
 use syntax::attr::AttrMetaMethods;
 
