@@ -21,7 +21,7 @@ fn bar(x: FooBar) {
 fn baz() {
     let mut x = Vec::new();
     x.push(Foo);
-    let y = x; //~ ERROR #[no_move] type `collections::vec::Vec<Foo>` moved
+    let y = x; //~ ERROR #[no_move] type `std::vec::Vec<Foo>` moved
 }
 
 fn quux() -> Foo {

@@ -6,15 +6,14 @@
 extern crate syntax;
 #[macro_use]
 extern crate rustc;
-extern crate rustc_front;
 extern crate rustc_plugin;
 
 use rustc_plugin::Registry;
 
-use rustc_front::hir::*;
+use rustc::hir::*;
 use syntax::ast::{NodeId, Name};
-use rustc::front::map as ast_map;
-use rustc_front::intravisit as visit;
+use rustc::hir::map as ast_map;
+use rustc::hir::intravisit as visit;
 use rustc::traits::ProjectionMode;
 use syntax::codemap::Span;
 use rustc::lint::{LintPass, LintArray, LateLintPass, LintContext};
@@ -146,11 +145,41 @@ fn is_ty_no_move(tcx: &ty::TyCtxt, t: ty::Ty) -> bool {
                     found = true;
                     return false;
                 }
+                if match_def_path(tcx, did.did, &["alloc", "rc", "Rc"]) ||
+                   match_def_path(tcx, did.did, &["alloc", "arc", "Arc"]) {
+                    return false;
+                }
                 true
             },
-            ty::TyRef(..) | ty::TyRawPtr(..) => false, // don't recurse down ptrs
+            ty::TyRef(..) | ty::TyRawPtr(..) | ty::TyBox(..) => false, // don't recurse down ptrs
             _ => true
         }
     });
     found
+}
+
+/// Check if a `DefId`'s path matches the given absolute type path usage.
+///
+/// # Examples
+/// ```
+/// match_def_path(cx, id, &["core", "option", "Option"])
+/// ```
+/// (Taken from clippy)
+pub fn match_def_path(tcx: &ty::TyCtxt, def_id: def_id::DefId, path: &[&str]) -> bool {
+    let krate = &tcx.crate_name(def_id.krate);
+    if krate != &path[0] {
+        return false;
+    }
+
+    let path = &path[1..];
+    let other = tcx.def_path(def_id).data;
+
+    if other.len() != path.len() {
+        return false;
+    }
+
+    other.into_iter()
+         .map(|e| e.data)
+         .zip(path)
+         .all(|(nm, p)| nm.as_interned_str() == *p)
 }
