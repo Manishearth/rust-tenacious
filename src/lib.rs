@@ -49,7 +49,7 @@ fn is_in_let(_: &ty::TyCtxt, _: NodeId) -> bool {
     true
 }
 
-declare_lint!(pub MOVED_NO_MOVE, Warn,
+declare_lint!(pub MOVED_NO_MOVE, Deny,
               "warn on moving of immovable types");
 
 impl LintPass for TenaciousPass {
