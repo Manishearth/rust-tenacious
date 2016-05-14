@@ -34,7 +34,7 @@ pub fn plugin_registrar(reg: &mut Registry) {
 pub struct TenaciousPass;
 
 #[cfg(feature = "rvalue_checks")]
-fn is_in_let(tcx: &ty::TyCtxt, id: NodeId) -> bool {
+fn is_in_let(tcx: ty::TyCtxt, id: NodeId) -> bool {
     if let ast_map::NodeStmt(ref st) = tcx.map.get(tcx.map.get_parent_node(id)) {
         if let StmtDecl(..) = st.node {
             println!("found");
@@ -45,7 +45,7 @@ fn is_in_let(tcx: &ty::TyCtxt, id: NodeId) -> bool {
 }
 
 #[cfg(not(feature = "rvalue_checks"))]
-fn is_in_let(_: &ty::TyCtxt, _: NodeId) -> bool {
+fn is_in_let(_: ty::TyCtxt, _: NodeId) -> bool {
     true
 }
 
@@ -62,10 +62,11 @@ impl LintPass for TenaciousPass {
 impl LateLintPass for TenaciousPass {
     fn check_fn(&mut self, cx: &Context, _: visit::FnKind, decl: &FnDecl, body: &Block, _: Span, id: NodeId) {
         let param_env = ty::ParameterEnvironment::for_item(cx.tcx, id);
-        let infcx = infer::new_infer_ctxt(cx.tcx, &cx.tcx.tables, Some(param_env), ProjectionMode::Any);
-        let mut v = TenaciousDelegate(cx);
-        let mut vis = euv::ExprUseVisitor::new(&mut v, &infcx);
-        vis.walk_fn(decl, body)
+        cx.tcx.infer_ctxt(None, Some(param_env), ProjectionMode::Any).enter(|infcx| {
+            let mut v = TenaciousDelegate(cx);
+            let mut vis = euv::ExprUseVisitor::new(&mut v, &infcx);
+            vis.walk_fn(decl, body)
+        })
     }
     fn check_struct_def(&mut self, cx: &Context, def: &VariantData, _: Name, _: &Generics, id: NodeId) {
         let item = match cx.tcx.map.get(id) {
@@ -86,7 +87,7 @@ impl LateLintPass for TenaciousPass {
 
 struct TenaciousDelegate<'a, 'tcx: 'a>(&'a Context<'a, 'tcx>);
 
-impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
+impl<'a, 'gcx, 'tcx> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'gcx> {
     fn consume(&mut self, _: NodeId, consume_span: Span,
                cmt: cmt<'tcx>, mode: euv::ConsumeMode) {
         if let Categorization::Rvalue(_) = cmt.cat {
@@ -133,7 +134,7 @@ impl<'a, 'tcx: 'a> euv::Delegate<'tcx> for TenaciousDelegate<'a, 'tcx> {
     fn mutate(&mut self, _: NodeId, _: Span, _: cmt<'tcx>, _: euv::MutateMode) {}
 }
 
-fn is_ty_no_move(tcx: &ty::TyCtxt, t: ty::Ty) -> bool {
+fn is_ty_no_move(tcx: ty::TyCtxt, t: ty::Ty) -> bool {
     let mut found = false;
     t.maybe_walk(|ty| {
         match ty.sty {
@@ -165,7 +166,7 @@ fn is_ty_no_move(tcx: &ty::TyCtxt, t: ty::Ty) -> bool {
 /// match_def_path(cx, id, &["core", "option", "Option"])
 /// ```
 /// (Taken from clippy)
-pub fn match_def_path(tcx: &ty::TyCtxt, def_id: def_id::DefId, path: &[&str]) -> bool {
+pub fn match_def_path(tcx: ty::TyCtxt, def_id: def_id::DefId, path: &[&str]) -> bool {
     let krate = &tcx.crate_name(def_id.krate);
     if krate != &path[0] {
         return false;
