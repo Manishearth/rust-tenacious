@@ -1,7 +1,7 @@
 [package]
 
 name = "tenacious"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Manish Goregaokar <manishsmail@gmail.com>"]
 description = "A plugin to prevent certain types from being moved"
 repository = "https://github.com/Manishearth/rust-tenacious"
@@ -14,7 +14,7 @@ name = "tenacious"
 plugin = true
 
 [dev-dependencies]
-compiletest_rs = "0.1.0"
+compiletest_rs = "0.2.0"
 
 [features]
 rvalue_checks = []

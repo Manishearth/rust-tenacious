@@ -14,7 +14,7 @@ use rustc::hir::*;
 use syntax::ast::{NodeId, Name};
 use rustc::hir::map as ast_map;
 use rustc::hir::intravisit as visit;
-use rustc::traits::ProjectionMode;
+use rustc::traits::Reveal;
 use syntax::codemap::Span;
 use rustc::lint::{LintPass, LintArray, LateLintPass, LintContext};
 use rustc::lint::LateContext as Context;
@@ -62,7 +62,7 @@ impl LintPass for TenaciousPass {
 impl LateLintPass for TenaciousPass {
     fn check_fn(&mut self, cx: &Context, _: visit::FnKind, decl: &FnDecl, body: &Block, _: Span, id: NodeId) {
         let param_env = ty::ParameterEnvironment::for_item(cx.tcx, id);
-        cx.tcx.infer_ctxt(None, Some(param_env), ProjectionMode::Any).enter(|infcx| {
+        cx.tcx.infer_ctxt(None, Some(param_env), Reveal::All).enter(|infcx| {
             let mut v = TenaciousDelegate(cx);
             let mut vis = euv::ExprUseVisitor::new(&mut v, &infcx);
             vis.walk_fn(decl, body)
