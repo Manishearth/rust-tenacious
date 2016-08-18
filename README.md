@@ -1,4 +1,10 @@
+# This crate is retired, since it will no longer work with MIR
+
 ## rust-tenacious 
+
+
+
+
 
 [![Build Status](https://travis-ci.org/Manishearth/rust-tenacious.svg?branch=master)](https://travis-ci.org/Manishearth/rust-tenacious)
 

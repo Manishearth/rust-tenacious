@@ -1,9 +1,9 @@
 [package]
 
 name = "tenacious"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["Manish Goregaokar <manishsmail@gmail.com>"]
-description = "A plugin to prevent certain types from being moved"
+description = "[RETIRED: Will not work with MIR] A plugin to prevent certain types from being moved"
 repository = "https://github.com/Manishearth/rust-tenacious"
 readme = "README.md"
 license = "MPL-2.0"
